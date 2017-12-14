@@ -7,26 +7,25 @@ class App extends Component {
       // taskList: [],
       curTime: 0,
       startTime: 0,
-      totalTime: 0
+      totalTime: 0,
+      working: false
     };
     this.startWork = this.startWork.bind(this);
     this.stopWork = this.stopWork.bind(this);
     this.updateCurTime = this.updateCurTime.bind(this);
-    // this.updateTime = this.updateTime.bind(this);
   }
   render() {
     console.log('curTime', this.state.curTime);
     let totalTime = this.millisecsToHourMinSecString(this.state.totalTime);
     let curTime = this.millisecsToHourMinSecString(this.state.curTime);
-    console.log(curTime, totalTime);
 
     return (
       <div>
         <h1>Task Manager - React.js</h1>
-        <button onClick={this.startWork}>
+        <button disabled={this.state.working} onClick={this.startWork}>
           Start working
         </button>
-        <button onClick={this.stopWork}>
+        <button disabled={!this.state.working} onClick={this.stopWork}>
           Stop working
         </button>
         <div>
@@ -74,7 +73,10 @@ class App extends Component {
   startWork() {
     this.setState({ curTime: 0 })
     let d = new Date();
-    this.setState({ startTime: d.getTime() }, this.updateCurTime);
+    this.setState({
+      startTime: d.getTime(),
+      working: true
+    }, this.updateCurTime);
     // AJAX call to database, create new time segment with: startTime,
   }
   stopWork() {
@@ -83,7 +85,10 @@ class App extends Component {
     let millisecDiff = d.getTime() - this.state.startTime;
     // this.setState({ stopTime: d.getTime() }); //redundant? no, AJAX call to write stopTime for the current time segment
     let totalTime = this.state.totalTime + millisecDiff;
-    this.setState({ totalTime });
+    this.setState({
+      totalTime,
+      working: false
+    });
   }
 }
 
