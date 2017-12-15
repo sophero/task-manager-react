@@ -45,7 +45,6 @@ class App extends Component {
   }
 
   millisecsToHourMinSecString(millisecs) {
-    let secs = millisecs / 1000;
     function addZeroNumToStr(num) {
       if (num < 10) {
         return String("0" + num);
@@ -53,8 +52,9 @@ class App extends Component {
         return String(num);
       }
     }
+    let secs = millisecs / 1000;
     let hours = Math.floor(secs / 3600);
-    let mins = Math.floor(secs / 60);
+    let mins = (Math.floor(secs / 60)) % 60;
     let remSecs = Math.floor(secs % 60);
     mins = addZeroNumToStr(mins);
     remSecs = addZeroNumToStr(remSecs);
