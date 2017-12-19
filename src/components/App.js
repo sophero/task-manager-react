@@ -41,7 +41,7 @@ class App extends Component {
   }
 
   componentWillUnmount() {
-    clearTimeout(this.updateCurTime);
+    clearTimeout(this.timer);
   }
 
   millisecsToHourMinSecString(millisecs) {
@@ -54,7 +54,7 @@ class App extends Component {
     }
     let secs = millisecs / 1000;
     let hours = Math.floor(secs / 3600);
-    let mins = (Math.floor(secs / 60)) % 60;
+    let mins = Math.floor(secs / 60) % 60;
     let remSecs = Math.floor(secs % 60);
     mins = addZeroNumToStr(mins);
     remSecs = addZeroNumToStr(remSecs);
@@ -77,13 +77,13 @@ class App extends Component {
       startTime: d.getTime(),
       working: true
     }, this.updateCurTime);
-    // AJAX call to database, create new time segment with: startTime,
+    // AJAX call to database, create new time segment with: startTime, activity name, user id..
   }
   stopWork() {
     clearTimeout(this.timer);
     let d = new Date();
     let millisecDiff = d.getTime() - this.state.startTime;
-    // this.setState({ stopTime: d.getTime() }); //redundant? no, AJAX call to write stopTime for the current time segment
+    // insert AJAX call to write stopTime for the current time segment
     let totalTime = this.state.totalTime + millisecDiff;
     this.setState({
       totalTime,
