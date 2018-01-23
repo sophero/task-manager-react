@@ -14,8 +14,8 @@ class App extends Component {
     this.stopWork = this.stopWork.bind(this);
     this.updateCurTime = this.updateCurTime.bind(this);
   }
+
   render() {
-    console.log('curTime', this.state.curTime);
     let totalTime = this.millisecsToHourMinSecString(this.state.totalTime);
     let curTime = this.millisecsToHourMinSecString(this.state.curTime);
 
@@ -47,7 +47,7 @@ class App extends Component {
   millisecsToHourMinSecString(millisecs) {
     function addZeroNumToStr(num) {
       if (num < 10) {
-        return String("0" + num);
+        return String('0' + num);
       } else {
         return String(num);
       }
@@ -64,21 +64,27 @@ class App extends Component {
       return `${hours}:${mins}:${remSecs}`;
     }
   }
+
   updateCurTime() {
     this.timer = setTimeout(() => {
       let curTime = Date.now() - this.state.startTime;
       this.setState({ curTime }, this.updateCurTime);
     }, 1000);
   }
+
   startWork() {
-    this.setState({ curTime: 0 })
+    this.setState({ curTime: 0 });
     let d = new Date();
-    this.setState({
-      startTime: d.getTime(),
-      working: true
-    }, this.updateCurTime);
+    this.setState(
+      {
+        startTime: d.getTime(),
+        working: true
+      },
+      this.updateCurTime
+    );
     // AJAX call to database, create new time segment with: startTime, activity name, user id..
   }
+
   stopWork() {
     clearTimeout(this.timer);
     let d = new Date();
