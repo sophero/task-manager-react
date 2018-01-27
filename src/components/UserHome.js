@@ -4,12 +4,20 @@ class UserHome extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      user: props.user
+      user: props.user,
+      token: props.token
     };
   }
 
   render() {
-    return <div>User Home</div>;
+    return (
+      <div>
+        <button onClick={() => this.props.signOut(this.state.token)}>
+          Sign Out
+        </button>
+        <h1>Welcome, {this.state.user.name}!</h1>
+      </div>
+    );
   }
 }
 

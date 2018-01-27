@@ -12,10 +12,6 @@ class UserForm extends Component {
       name: ''
     };
     this.onFormSubmit = this.onFormSubmit.bind(this);
-    this.updateName = this.updateName.bind(this);
-    this.updateEmail = this.updateEmail.bind(this);
-    this.updatePassword = this.updatePassword.bind(this);
-    this.updateConfirmPassword = this.updateConfirmPassword.bind(this);
   }
 
   componentWillReceiveProps(newProps) {
@@ -23,8 +19,6 @@ class UserForm extends Component {
   }
 
   render() {
-    let submitBtnText = this.props.form;
-
     let placeholders = {
       name: 'First name',
       email: 'Email address'
@@ -42,7 +36,7 @@ class UserForm extends Component {
           placeholder={placeholders.name}
           name="name"
           value={this.state.fname}
-          onChange={event => this.updateName(event.target.value)}
+          onChange={event => this.setState({ name: event.target.value })}
         />
       );
       confirmPasswordInput = (
@@ -50,7 +44,9 @@ class UserForm extends Component {
           placeholder="Confirm password"
           name="confirmPassword"
           value={this.state.confirmPassword}
-          onChange={event => this.updateConfirmPassword(event.target.value)}
+          onChange={event =>
+            this.setState({ confirmPassword: event.target.value })
+          }
         />
       );
     }
@@ -62,16 +58,16 @@ class UserForm extends Component {
             placeholder={placeholders.email}
             name="email"
             value={this.state.email}
-            onChange={event => this.updateEmail(event.target.value)}
+            onChange={event => this.setState({ email: event.target.value })}
           />
           <input
             placeholder="Password"
             name="password"
             value={this.state.password}
-            onChange={event => this.updatePassword(event.target.value)}
+            onChange={event => this.setState({ password: event.target.value })}
           />
           {confirmPasswordInput}
-          <button type="submit">{submitBtnText}</button>
+          <button type="submit">{this.props.form}</button>
         </form>
       </div>
     );
@@ -80,7 +76,7 @@ class UserForm extends Component {
   onFormSubmit(event) {
     event.preventDefault();
     let form = this.props.form;
-    // check passwords match if signing up new user or changing existing password
+    // insert check if passwords match if signing up new user or changing existing password
     let user = {
       email: event.target.email.value,
       password: event.target.password.value
@@ -93,19 +89,6 @@ class UserForm extends Component {
       // } else if (form === 'Update') {
       //   this.props.update(event.target);
     }
-  }
-
-  updateName(name) {
-    this.setState({ name });
-  }
-  updateEmail(email) {
-    this.setState({ email });
-  }
-  updatePassword(password) {
-    this.setState({ password });
-  }
-  updateConfirmPassword(confirmPassword) {
-    this.setState({ confirmPassword });
   }
 }
 
