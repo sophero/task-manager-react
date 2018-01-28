@@ -31,29 +31,30 @@ class App extends Component {
         />
       );
     }
-    let signInBtnClass = 'btn';
-    let signUpBtnClass = 'btn';
+    let signInTabClass = 'btn';
+    let signUpTabClass = 'btn';
     if (this.state.form === 'Sign In') {
-      signInBtnClass = 'btn-selected';
+      signInTabClass = 'btn-selected';
     } else if (this.state.form === 'Sign Up') {
-      signUpBtnClass = 'btn-selected';
+      signUpTabClass = 'btn-selected';
     }
     return (
       <div>
-        <button
+        <div
           onClick={() => this.setState({ form: 'Sign Up' })}
-          className={signUpBtnClass}
+          className={signUpTabClass}
         >
           Sign Up
-        </button>
-        <button
+        </div>
+        <div
           onClick={() => this.setState({ form: 'Sign In' })}
-          className={signInBtnClass}
+          className={signInTabClass}
         >
           Sign In
-        </button>
+        </div>
         <UserForm
           form={this.state.form}
+          user={this.state.user}
           createUser={this.createUser}
           signIn={this.signIn}
         />

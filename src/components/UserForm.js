@@ -6,16 +6,17 @@ class UserForm extends Component {
     this.state = {
       form: props.form,
       user: props.user,
+      errorMsg: '',
+      name: '',
       email: '',
       password: '',
-      confirmPassword: '',
-      name: ''
+      confirmPassword: ''
     };
     this.onFormSubmit = this.onFormSubmit.bind(this);
   }
 
   componentWillReceiveProps(newProps) {
-    this.setState({ form: newProps.form });
+    this.setState({ form: newProps.form, user: newProps.user });
   }
 
   render() {
@@ -68,6 +69,7 @@ class UserForm extends Component {
           />
           {confirmPasswordInput}
           <button type="submit">{this.props.form}</button>
+          <span>{this.state.errorMsg}</span>
         </form>
       </div>
     );
@@ -76,16 +78,21 @@ class UserForm extends Component {
   onFormSubmit(event) {
     event.preventDefault();
     let form = this.props.form;
-    // insert check if passwords match if signing up new user or changing existing password
     let user = {
       email: event.target.email.value,
       password: event.target.password.value
     };
+
     if (form === 'Sign Up') {
+      if (event.target.password.value !== event.target.confirmPassword.value) {
+        this.setState({ errorMsg: 'Passwords do not match.' });
+        return;
+      }
       user.name = event.target.name.value;
       this.props.createUser(user);
     } else if (form === 'Sign In') {
       this.props.signIn(user);
+
       // } else if (form === 'Update') {
       //   this.props.update(event.target);
     }
