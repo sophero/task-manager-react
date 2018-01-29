@@ -4,8 +4,6 @@ class UserForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      form: props.form,
-      user: props.user,
       errorMsg: '',
       name: '',
       email: '',
@@ -15,23 +13,19 @@ class UserForm extends Component {
     this.onFormSubmit = this.onFormSubmit.bind(this);
   }
 
-  componentWillReceiveProps(newProps) {
-    this.setState({ form: newProps.form, user: newProps.user });
-  }
-
   render() {
     let placeholders = {
       name: 'First name',
       email: 'Email address'
     };
-    if (this.state.form === 'Update') {
-      placeholders.name = this.state.user.name;
-      placeholders.email = this.state.user.email;
+    if (this.props.form === 'Update') {
+      placeholders.name = this.props.user.name;
+      placeholders.email = this.props.user.email;
     }
 
     let nameInput, confirmPasswordInput;
 
-    if (this.state.form !== 'Sign In') {
+    if (this.props.form !== 'Sign In') {
       nameInput = (
         <input
           placeholder={placeholders.name}

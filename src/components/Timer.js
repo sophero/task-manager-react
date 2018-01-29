@@ -1,36 +1,36 @@
 import React, { Component } from 'react';
+import axios from 'axios';
+
+import { url } from '../config';
 
 class Timer extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
-      // taskList: [],
       curTime: 0,
       startTime: 0,
-      totalTime: 0,
+      // totalTime: 0,
       working: false
     };
-    this.startWork = this.startWork.bind(this);
-    this.stopWork = this.stopWork.bind(this);
+    this.start = this.start.bind(this);
+    this.stop = this.stop.bind(this);
     this.updateCurTime = this.updateCurTime.bind(this);
   }
+
   render() {
-    console.log('curTime', this.state.curTime);
     let totalTime = this.millisecsToHourMinSecString(this.state.totalTime);
     let curTime = this.millisecsToHourMinSecString(this.state.curTime);
+    console.log(this.props);
 
     return (
       <div>
-        <button disabled={this.state.working} onClick={this.startWork}>
-          Start working
+        <button disabled={this.state.working} onClick={this.start}>
+          Start
         </button>
-        <button disabled={!this.state.working} onClick={this.stopWork}>
-          Stop working
+        <button disabled={!this.state.working} onClick={this.stop}>
+          Stop
         </button>
-        <div>
-          <h2>Current working time:</h2>
-          {curTime}
-        </div>
+        <div>{curTime}</div>
       </div>
     );
   }
@@ -59,34 +59,52 @@ class Timer extends Component {
       return `${hours}:${mins}:${remSecs}`;
     }
   }
+
   updateCurTime() {
     this.timer = setTimeout(() => {
       let curTime = Date.now() - this.state.startTime;
       this.setState({ curTime }, this.updateCurTime);
     }, 1000);
   }
-  startWork() {
+
+  start() {
     this.setState({ curTime: 0 });
-    let d = new Date();
-    this.setState(
-      {
-        startTime: d.getTime(),
-        working: true
-      },
-      this.updateCurTime
-    );
-    // AJAX call to database, create new time segment with: startTime, activity name, user id..
+    let startTime = new Date().getTime();
+    this.setState({ startTime, working: true }, this.updateCurTime);
+    axios({
+      method: 'post',
+      url: `${url}/time_segments`,
+      headers: { 'x-auth': this.props.token },
+      data: {
+        startTime,
+        _activity_id: this.props.activity._id
+      }
+    })
+      .then(res => {
+        this.setState({ timeSegmentId: res.data.time_segment._id });
+      })
+      .catch(e => console.log(e));
+    // AJAX call to database, create new time segment with: startTime, activity name
   }
-  stopWork() {
+
+  stop() {
     clearTimeout(this.timer);
-    let d = new Date();
-    let millisecDiff = d.getTime() - this.state.startTime;
+    let stopTime = new Date().getTime();
+    let millisecDiff = stopTime - this.state.startTime;
     // insert AJAX call to write stopTime for the current time segment
-    let totalTime = this.state.totalTime + millisecDiff;
+    // let totalTime = this.state.totalTime + millisecDiff;
     this.setState({
-      totalTime,
+      // totalTime,
       working: false
     });
+    axios({
+      method: 'patch',
+      url: `${url}/time_segments/${this.state.timeSegmentId}`,
+      headers: { 'x-auth': this.props.token },
+      data: { stopTime }
+    })
+      .then(res => console.log(res))
+      .catch(e => console.log(e));
   }
 }
 

@@ -3,8 +3,7 @@ import axios from 'axios';
 
 import UserForm from './UserForm';
 import UserHome from './UserHome';
-
-const url = 'http://localhost:3002';
+import { url } from '../config';
 
 class App extends Component {
   constructor() {
