@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Timer from './Timer';
+// import Timer from './Timer';
 
 const CurrentActivity = props => {
   if (!props.activity) {
@@ -9,7 +9,13 @@ const CurrentActivity = props => {
   return (
     <div>
       <div>{props.activity.name}</div>
-      <Timer token={props.token} activity={props.activity} />
+      {/* Put edit current activity button here with props.updateActivity callback */}
+      {/* <Timer
+        token={props.token}
+        activity={props.activity}
+        readActivities={props.readActivities}
+        getTimeSegments={props.getTimeSegments}
+      /> */}
     </div>
   );
 };
