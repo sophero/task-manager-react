@@ -5,7 +5,7 @@ import { url } from '../config';
 import ActivityForm from './ActivityForm';
 import ActivityList from './ActivityList';
 import CurrentActivity from './CurrentActivity';
-// import IntervalSelect from './IntervalSelect';
+import SelectInterval from './SelectInterval';
 import ListTimeSegments from './ListTimeSegments';
 import Timer from './Timer';
 
@@ -14,24 +14,24 @@ class UserHome extends Component {
     super(props);
     this.state = {
       activityList: [],
+      curIntervalStart: '',
+      curIntervalStop: '',
       currentActivity: null,
-      currentInterval: { start: '', stop: '' },
-      currentView: 'home',
-      selectInterval: { start: '', stop: '' },
+      currentView: 'viewInterval',
       timeSegments: []
     };
-    this.readActivities();
     this.createActivity = this.createActivity.bind(this);
     this.readActivities = this.readActivities.bind(this);
     this.selectActivity = this.selectActivity.bind(this);
-    this.resetSelectInterval = this.resetSelectInterval.bind(this);
+    this.setCurInterval = this.setCurInterval.bind(this);
     this.getTimeSegments = this.getTimeSegments.bind(this);
+    this.readActivities();
   }
 
   render() {
     console.log('UserHome state:', this.state);
-    let activityForm, intervalSelect; // child components
-    let homeBtn, newActivityBtn, intervalSelectBtn; // buttons to switch between views
+    let activityForm, selectInterval, listTimeSegments; // child components
+    let homeBtn, newActivityBtn, selectIntervalBtn; // buttons to switch between views
     if (this.state.currentView !== 'home') {
       homeBtn = (
         <button onClick={() => this.setState({ currentView: 'home' })}>
@@ -45,10 +45,8 @@ class UserHome extends Component {
           Add new activity
         </button>
       );
-      intervalSelectBtn = (
-        <button
-          onClick={() => this.setState({ currentView: 'intervalSelect' })}
-        >
+      selectIntervalBtn = (
+        <button onClick={() => this.setState({ currentView: 'viewInterval' })}>
           View by Day/Week/Month
         </button>
       );
@@ -65,39 +63,18 @@ class UserHome extends Component {
       );
     }
 
-    if (this.state.currentView === 'intervalSelect') {
-      intervalSelect = (
-        // <IntervalSelect
-        //   token={this.props.token}
-        //   getTimeSegments={this.getTimeSegments}
-        //   timeSegments={this.state.timeSegments}
-        // />
-        <div>
-          <div>
-            <input
-              value={this.state.selectInterval.start}
-              onChange={event =>
-                this.setState({ 'selectInterval.start': event.target.value })
-              }
-            />
-            <input
-              value={this.state.selectInterval.stop}
-              onChange={event =>
-                this.setState({ 'selectInterval.stop': event.target.value })
-              }
-            />
-          </div>
-          <button onClick={this.resetSelectInterval}>
-            Reset to past 24 hours
-          </button>
-          <button onClick={this.getTimeSegments}>View activity</button>
-        </div>
+    if (this.state.currentView === 'viewInterval') {
+      selectInterval = (
+        <SelectInterval
+          getTimeSegments={this.getTimeSegments}
+          setCurInterval={this.setCurInterval}
+          timeSegments={this.state.timeSegments}
+        />
       );
     }
 
-    let ListTimeSegments;
-    if (this.state.timeSegments.length > 0) {
-      ListTimeSegments = (
+    if (this.state.currentView === 'viewInterval') {
+      listTimeSegments = (
         <ListTimeSegments timeSegments={this.state.timeSegments} />
       );
     }
@@ -121,18 +98,16 @@ class UserHome extends Component {
           readActivities={this.readActivities}
           getTimeSegments={this.getTimeSegments}
         />
-        {/* {timer} */}
         <ActivityList
           activityList={this.state.activityList}
           currentActivity={this.state.currentActivity}
           selectActivity={this.selectActivity}
         />
-
         {activityForm}
-        {intervalSelect}
-        {ListTimeSegments}
+        {selectInterval}
+        {listTimeSegments}
         {homeBtn}
-        {intervalSelectBtn}
+        {selectIntervalBtn}
         {newActivityBtn}
       </div>
     );
@@ -171,30 +146,25 @@ class UserHome extends Component {
       .catch(e => console.log(e));
   }
 
-  resetSelectInterval() {
-    let d = new Date();
-    // this.setState({
-    //   'selectInterval.start': d.getTime() - 8640000,
-    //   'selectInterval.stop': d.getTime()
-    // });
-    this.setState({
-      selectInterval: {
-        ...this.state.selectInterval,
-        start: d.getTime() - 8640000,
-        stop: d.getTime()
-      }
-    });
+  setCurInterval(curIntervalStart, curIntervalStop) {
+    this.setState({ curIntervalStart, curIntervalStop });
   }
 
-  getTimeSegments() {
-    let { start, stop } = this.state.selectInterval;
+  getTimeSegments(start, stop) {
+    if (!start || !stop) {
+      start = this.state.curIntervalStart;
+      stop = this.state.curIntervalStop;
+    }
     axios({
       method: 'get',
       url: `${url}/time_segments/${start}/${stop}`,
       headers: { 'x-auth': this.props.token }
     })
       .then(res => {
-        this.setState({ timeSegments: res.data.timeSegments });
+        this.setCurInterval(start, stop);
+        this.setState({
+          timeSegments: res.data.timeSegments
+        });
       })
       .catch(e => console.log(e));
   }

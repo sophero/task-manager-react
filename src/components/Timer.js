@@ -92,17 +92,10 @@ class Timer extends Component {
   stop() {
     clearTimeout(this.timer);
     let stopTime = new Date().getTime();
-    let millisecDiff = stopTime - this.state.startTime;
     this.setState({
       working: false
     });
-    console.log('timeSegmentId:', this.state.timeSegmentId);
-    console.log({
-      method: 'patch',
-      url: `${url}/time_segments/${this.state.timeSegmentId}`,
-      headers: { 'x-auth': this.props.token },
-      data: { stopTime }
-    });
+
     axios({
       method: 'patch',
       url: `${url}/time_segments/${this.state.timeSegmentId}`,
