@@ -9,7 +9,6 @@ class Timer extends Component {
     this.state = {
       curTime: 0,
       startTime: 0,
-      // totalTime: 0,
       working: false
     };
     this.start = this.start.bind(this);
@@ -18,9 +17,9 @@ class Timer extends Component {
   }
 
   render() {
-    let totalTime = this.millisecsToHourMinSecString(this.state.totalTime);
     let curTime = this.millisecsToHourMinSecString(this.state.curTime);
-    console.log(this.props);
+    console.log('Timer state:', this.state);
+    console.log('Timer props:', this.props);
 
     return (
       <div>
@@ -68,6 +67,10 @@ class Timer extends Component {
   }
 
   start() {
+    if (!this.props.activity) {
+      console.log('Timer missing this.props.activity');
+      return; // error message?
+    }
     this.setState({ curTime: 0 });
     let startTime = new Date().getTime();
     this.setState({ startTime, working: true }, this.updateCurTime);
@@ -84,26 +87,26 @@ class Timer extends Component {
         this.setState({ timeSegmentId: res.data.time_segment._id });
       })
       .catch(e => console.log(e));
-    // AJAX call to database, create new time segment with: startTime, activity name
   }
 
   stop() {
     clearTimeout(this.timer);
     let stopTime = new Date().getTime();
-    let millisecDiff = stopTime - this.state.startTime;
-    // insert AJAX call to write stopTime for the current time segment
-    // let totalTime = this.state.totalTime + millisecDiff;
     this.setState({
-      // totalTime,
       working: false
     });
+
     axios({
       method: 'patch',
       url: `${url}/time_segments/${this.state.timeSegmentId}`,
       headers: { 'x-auth': this.props.token },
       data: { stopTime }
     })
-      .then(res => console.log(res))
+      .then(res => {
+        console.log(res);
+        this.props.readActivities();
+        this.props.getTimeSegments();
+      })
       .catch(e => console.log(e));
   }
 }

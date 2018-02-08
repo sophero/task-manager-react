@@ -11,11 +11,13 @@ class App extends Component {
     this.state = {
       user: null,
       token: null,
+      errorMsg: '',
       form: 'Sign In'
     };
     this.createUser = this.createUser.bind(this);
-    this.signIn = this.signIn.bind(this);
     this.saveUserToState = this.saveUserToState.bind(this);
+    this.setErrorMsg = this.setErrorMsg.bind(this);
+    this.signIn = this.signIn.bind(this);
     this.signOut = this.signOut.bind(this);
   }
 
@@ -26,6 +28,7 @@ class App extends Component {
         <UserHome
           user={this.state.user}
           token={this.state.token}
+          setErrorMsg={this.setErrorMsg}
           signOut={this.signOut}
         />
       );
@@ -74,6 +77,10 @@ class App extends Component {
       token: response.headers['x-auth'],
       form: 'Sign Out'
     });
+  }
+
+  setErrorMsg(errorMsg) {
+    this.setState({ errorMsg });
   }
 
   signIn(credentials) {
